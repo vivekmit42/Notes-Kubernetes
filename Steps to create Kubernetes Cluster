@@ -1,0 +1,14 @@
+In this We are working with 1 Master and 2 Nodes
+
+
+                                                            Master Node Configuration Steps
+Step 1: Install Docker:    sudo apt-get install docker.io
+Step 2: Start and Enable Docker: sudo systemctl enable docker | sudo systemctl start docker
+Step 3: Install Kubernetes
+      Add Kubernetes Signing Key: sudo apt-get install curl  |  curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add  
+      Add Software Repositories:  sudo apt-add-repository "deb http://apt.kubernetes.io/ kubernetes-xenial main"
+      Kubernetes Installation Tools: sudo apt-get install kubeadm kubelet kubectl kubernetes-cni
+      Begin Kubernetes Deployment: sudo swapoff -a
+      Assign Unique Hostname for Each Server Node: sudo hostnamectl set-hostname master-node
+      
+      
