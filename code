@@ -1,0 +1,2 @@
+kubeadm join 10.101.150.199:6443 --token 7vcg8y.23ufo4aqwljo2t5v \
+	--discovery-token-ca-cert-hash sha256:d9185bb77248fc12d2190da6ede2d9cdb48e4dd0dd36e5a1fbbd0d0fbc9c79d4 
