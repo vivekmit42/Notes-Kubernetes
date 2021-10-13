@@ -10,5 +10,38 @@ Step 3: Install Kubernetes
       Kubernetes Installation Tools: sudo apt-get install kubeadm kubelet kubectl kubernetes-cni
       Begin Kubernetes Deployment: sudo swapoff -a
       Assign Unique Hostname for Each Server Node: sudo hostnamectl set-hostname master-node
-      
-      
+      Create this file "daemon.json" in the directory "/etc/docker" and add the following:
+      {
+      "exec-opts": ["native.cgroupdriver=systemd"]
+      }
+      Restart your docker service: systemctl restart docker
+
+Step 4: Initialize Kubernetes on Master Node: kubeadm init
+                                  Once this command finishes, it will display a kubeadm join message at the end.
+                                  Make a note of the whole entry. This will be used to join the worker nodes to the cluster.
+                                 
+                                 Copy these code from output of kubeadm init command. and run like this
+                                  kubernetes-master:~$ mkdir -p $HOME/.kube
+                                  kubernetes-master:~$ sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+                                  kubernetes-master:~$ sudo chown $(id -u):$(id -g) $HOME/.kube/config
+Step 5: Deploy Pod Network to Cluster: sudo kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml
+Step 6: Verify that everything is running and communicating: kubectl get pods --all-namespaces
+Step 7: After Worker node configuration completes then run this command to see your cluster: kubectl get nodes
+
+                                                           Worker Node Configuration Steps
+
+Step 1: Install Docker:    sudo apt-get install docker.io
+Step 2: Start and Enable Docker: sudo systemctl enable docker | sudo systemctl start docker
+Step 3: Install Kubernetes
+      Add Kubernetes Signing Key: sudo apt-get install curl  |  curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add  
+      Add Software Repositories:  sudo apt-add-repository "deb http://apt.kubernetes.io/ kubernetes-xenial main"
+      Kubernetes Installation Tools: sudo apt-get install kubeadm kubelet kubectl kubernetes-cni
+      Begin Kubernetes Deployment: sudo swapoff -a
+      Assign Unique Hostname for Each Server Node: sudo hostnamectl set-hostname master-node
+      Create this file "daemon.json" in the directory "/etc/docker" and add the following:
+      {
+      "exec-opts": ["native.cgroupdriver=systemd"]
+      }
+      Restart your docker service: systemctl restart docker
+Step 4: Copy long command kubeadm join command from output of kubeadm init command and run like this:
+          kubeadm join --discovery-token abcdef.1234567890abcdef --discovery-token-ca-cert-hash sha256:1234..cdef 1.2.3.4:6443
