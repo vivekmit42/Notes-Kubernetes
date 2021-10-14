@@ -1,0 +1,20 @@
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+   name: vivek
+spec:
+   replicas: 2
+   selector:     
+    matchLabels:
+     myname: vivek
+   template:
+     metadata:
+       name: testpoddevlopment
+       labels:
+         myname: vivek
+     spec:
+      containers:
+        - name: c00
+          image: ubuntu
+          command: ["/bin/bash", "-c", "while true; do echo Hi this is vivek; sleep 5; done"]
+
