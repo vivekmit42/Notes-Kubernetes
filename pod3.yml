@@ -1,0 +1,16 @@
+kind: Pod
+apiVersion: v1                     
+metadata:                           
+  name: testpodenv                  
+  annotations:
+          Description: This is third pod we have thank you
+spec:                                    
+  containers:                      
+    - name: c00                     
+      image: ubuntu              
+      command: ["/bin/bash", "-c", "while true; do echo Hello-Vivek This is Kubernetes first Pod Container; sleep 5 ; done"]
+      env:
+              - name: MYNAME
+                value: Vivek
+  restartPolicy: Never         # Defaults to Always
+

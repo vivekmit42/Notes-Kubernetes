@@ -1,0 +1,13 @@
+kind: Pod
+apiVersion: v1                     
+metadata:                           
+  name: testpod4                  
+  annotations:
+          Description: This is fourth pod we have thank you
+spec:                                    
+  containers:                      
+    - name: c00                     
+      image: httpd
+      ports:
+       - containerPort: 80      
+      
