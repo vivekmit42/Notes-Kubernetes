@@ -18,7 +18,7 @@ What is Pod?
 ** A single instance of a running process in a cluster.
 ** It can run one or more containers and share the same resources.
 
-
+--------------------------------------------------------------------------------------------------------------------------
 Architecture of K8s:
 In a cluster, we have Multiple nodes:
 ** One Master Node & Multiple Worker Nodes
@@ -37,13 +37,14 @@ SCHEDULER:
 ** It is the unit responsbile for scheduling and running pods in cluster.
 ** It is responsible to node to newly created Pods.
 
+CONTROLLER MANAGER:
+** It is responsible for managing the state of the cluster.
+** It is the unit which is responsible for taking care of every component in the K8 is working as per requirement or not. 
+
 ETCD:
 ** It is the database of K8 system and it is in key-value store, having all cluster data
 
-CONTROLLER MANAGER:
-** It is the unit which is responsible for taking care of every component in the K8 is working as per requirement or not. 
-** It is responsible for managing the state of the cluster.
-
+-------------------------------------------------------------------------------------------------------------------------
 Different components of Worker Node:
 
 KUBELET:
@@ -53,16 +54,13 @@ KUBELET:
 SERVICE PROXY/ KUBE PROXY:
 ** Pods are isolated, we can access it directly from outside.
 ** It is the service by which outside user can access isolated pods through apiserver and kubelet.
-KUBECTL:
-** It is controller tool  which is used to send commands to every component of K8 system via API Server.
 
-CONTAINER NETWORK INTERFACE NETWORK (like WEAVE NET, CALICO. etc) :
+CNI (CONTAINER NETWORK INTERFACE) NETWORK (like WEAVE NET, CALICO. etc) :
 ** It is the network system which is responsible for all the communications happens between master node, worker node, clusters, pods, etc.
 
-    
-KUBE-PROXY:
-** It maintains the network rules for comm with pods.
-
+KUBECTL:
+** It is controller tool  which is used to send commands to every component of K8 system via API Server.
+------------------------------------------------------------------------------------------------------------------------    
 Features of K8s:
 ** Container Orchestration
 ** Scalability
@@ -70,6 +68,26 @@ Features of K8s:
 ** High Availablity
 ** Rollouts & Rollback
 
+--------------------------------------------------------------------------------------------------------------------------
+
+Most popular methods of building kubernetes cluster:
+
+**Kubeadm
+* Minimum machine required - 2 or more than 2
+* Install kubeadm in all machines then forms a cluster
+
+**minikube
+* Minimum machine required - 1
+* Install minikube in all machines then forms a cluster
+
+** KIND Cluster
+* It means kubernetes in docker
+
+** Elastic kubernetes service
+** Azure Kubernetes service
+** Google Kubernetes service
+
+--------------------------------------------------------------------------------------------------------------------------
 Installations of K8s:
 
 Step 1. Download & Install kubectl binary with curl on Linux
@@ -117,16 +135,112 @@ clientVersion:
   minor: "32"
   platform: linux/amd64
 kustomizeVersion: v5.5.0
+--------------------------------------------------------------------------------------------------------------------------
+Creating KIND Cluster
 
+Step 1. To install, download the binary for your platform
+[ $(uname -m) = x86_64 ] && curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.26.0/kind-linux-amd64
 
-Step 6. Installing minikube, Run this command To download the latest minikube stable release on x86-64 Linux using binary download:
+Step 2. Creating a directory and change its permission.
+# chmod +x ./kind
+# sudo mv ./kind /usr/local/bin/kind
+
+Step 3. Download & Install kubectl binary with curl on Linux
+# curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+100   138  100   138    0     0    398      0 --:--:-- --:--:-- --:--:--   398
+100 54.6M  100 54.6M    0     0  2283k      0  0:00:24  0:00:24 --:--:-- 2306k
+
+Step 4. Validate the binary (optional)
+# curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl.sha256"
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+100   138  100   138    0     0    399      0 --:--:-- --:--:-- --:--:--   400
+100    64  100    64    0     0    163      0 --:--:-- --:--:-- --:--:--   163
+
+Step 5. Validate the kubectl binary against the checksum file:
+# echo "$(cat kubectl.sha256)  kubectl" | sha256sum --check
+kubectl: OK
+
+Step 6. Install kubectl
+# install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
+
+Note:If you do not have root access on the target system, you can still install kubectl to the ~/.local/bin directory:
+# chmod +x kubectl
+# mkdir -p ~/.local/bin
+# mv ./kubectl ~/.local/bin/kubectl
+
+Step 7. Test to ensure the version you installed is up-to-date:
+# kubectl version --client
+
+Step 8. Create KIND cluster configuration file
+#vim config.yml
+
+kind: Cluster
+apiVersion: kind.x-k8s.io/v1alpha4
+nodes:
+- role: control-plane
+  image: kindest/node:v1.29.12
+- role: worker
+  image: kindest/node:v1.29.12
+- role: worker
+  image: kindest/node:v1.29.12
+- role: worker
+  image: kindest/node:v1.29.12
+  extraPortMappings:
+  - containerPort: 80
+    hostPort: 80
+    protocol: tcp
+  - containerPort: 443
+    hostPort: 443
+    protocol: tcp
+
+save and exit
+
+Step 9. run this command to create a new kind cluster with name=tws01-cluster  above configuration file.
+
+# kind create cluster --name=tws01-cluster --config=config.yml
+Creating cluster "tws01-cluster" ...
+ ✓ Ensuring node image (kindest/node:v1.29.12) 🖼
+ ✓ Preparing nodes 📦 📦 📦 📦
+ ✓ Writing configuration 📜
+ ✓ Starting control-plane 🕹️
+ ✓ Installing CNI 🔌
+ ✓ Installing StorageClass 💾
+ ✓ Joining worker nodes 🚜
+Set kubectl context to "kind-tws01-cluster"
+You can now use your cluster with:
+
+kubectl cluster-info --context kind-tws01-cluster
+
+Have a question, bug, or feature request? Let us know! https://kind.sigs.k8s.io/#community 🙂
+
+# kubectl cluster-info --context kind-tws01-cluster
+Kubernetes control plane is running at https://127.0.0.1:37783
+CoreDNS is running at https://127.0.0.1:37783/api/v1/namespaces/kube-system/services/kube-dns:dns/proxy
+
+To further debug and diagnose cluster problems, use 'kubectl cluster-info dump'.
+
+# kubectl get nodes
+NAME                          STATUS   ROLES           AGE     VERSION
+tws01-cluster-control-plane   Ready    control-plane   5m35s   v1.29.12
+tws01-cluster-worker          Ready    <none>          5m5s    v1.29.12
+tws01-cluster-worker2         Ready    <none>          5m5s    v1.29.12
+tws01-cluster-worker3         Ready    <none>          5m3s    v1.29.12
+
+# kind delete cluster
+--------------------------------------------------------------------------------------------------------------------------
+Creating Minikube Cluster
+
+Step 1. Installing minikube, Run this command To download the latest minikube stable release on x86-64 Linux using binary download:
 
 # curl -LO https://storage.googleapis.com/minikube/releases/latest/minikube-latest.x86_64.rpm
   % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
                                  Dload  Upload   Total   Spent    Left  Speed
 100 45.2M  100 45.2M    0     0   760k      0  0:01:00  0:01:00 --:--:--  300k
 
-Step 7. Run this command To install the latest minikube stable release on x86-64 Linux using binary download:
+Step 2. Run this command To install the latest minikube stable release on x86-64 Linux using binary download:
 # sudo rpm -Uvh minikube-latest.x86_64.rpm
 Preparing...                          ################################# [100%]
 Updating / installing...
@@ -135,8 +249,8 @@ localhost:~ # systemctl start docker.service
 localhost:~ # systemctl enable docker.service
 Created symlink /etc/systemd/system/multi-user.target.wants/docker.service → /usr/lib/systemd/system/docker.service.
 
-Step 8. Start your cluster
-# minikube start --force
+Step 3. Start your cluster
+#  minikube start --driver=docker --vm=true --force
 * minikube v1.35.0 on Opensuse-Leap 15.6
 ! minikube skips various validations when --force is supplied; this may lead to unexpected behavior
 * Automatically selected the docker driver. Other choices: ssh, none
@@ -160,7 +274,7 @@ Step 8. Start your cluster
 * Enabled addons: storage-provisioner, default-storageclass
 * Done! kubectl is now configured to use "minikube" cluster and "default" namespace by default
 
-Step 9. Verify whether you have started your cluster or not?
+Step 4. Verify whether you have started your cluster or not?
 # minikube status
 minikube
 type: Control Plane
@@ -169,7 +283,7 @@ kubelet: Running
 apiserver: Running
 kubeconfig: Configured
 
-Step 10. Interact with your cluster (access your shiny new cluster)
+Step 5. Interact with your cluster (access your shiny new cluster)
 # kubectl get po -A
 NAMESPACE     NAME                               READY   STATUS    RESTARTS      AGE
 kube-system   coredns-668d6bf9bc-hkdq6           1/1     Running   0             13m
@@ -182,6 +296,7 @@ kube-system   storage-provisioner                1/1     Running   1 (13m ago)  
 
 OR
 Alternatively, minikube can download the appropriate version of kubectl and you should be able to use it like this:
+ 
  # minikube kubectl -- get po -A
 NAMESPACE     NAME                               READY   STATUS    RESTARTS      AGE
 kube-system   coredns-668d6bf9bc-hkdq6           1/1     Running   0             14m
@@ -278,3 +393,63 @@ In Brief, Work flow of K8 Cluster:
 5. Scale up your app
 6. Update your app
 -------------------------------------------------------------------------------------------------------------------------
+
+Creating Kubeadm Cluster
+Note: Here we need two separate machines, One will be used as Master Node and other one will be used as Worker Node.
+
+It is pending
+
+-------------------------------------------------------------------------------------------------------------------------
+
+Run a docker container in a pod --> for auto scaling, auto healing we need deployment --> now we need that this deployment is accessible to internet user, for this we need kubernetes service -->
+
+example: -
+
+NGINX --> NGINX POD --> NGINX deployment --> NGINX service
+
+MYSQL --> MYSQL POD --> MYSQL deployment --> MYSQL service
+
+-------------------------------------------------------------------------------------------------------------------------
+
+Resources - pods, deployment, services, etc are referred as resources in kubernetes
+
+Namespaces - groups of similar types of resources is referred as namespaces in kubernetes. its main purpose is to isolate one set of deployment.
+
+if you have not created any namespace and if you have running resources then by default those resources will be tagged with default namespace.
+
+#kubectl get namespace   - to check list of namespace running
+
+kube-node-lease - all information about about every nodes in your cluster will be saved here.
+
+kube-public - all public/external related services information will be saved here.
+
+kube-system - system level services will be found here
+
+local-path-storage - it will give info about pods using local storage
+
+# kubectl get pods - to list out all running pods in your cluster
+
+# kubectl run ngnx --image=nginx - this command will create nginx pod
+
+# kubectl get pods - to see nginx pods is running or not
+
+# kubectl delete pod nginx - it will delete your pod nginx
+
+# kubectl run ngnx --image=nginx -n nginx_namespace - this command will create nginx pod in a namespace which is called as "nginx_namespace"
+
+# kubectl get pods -n nginx_namespace - to see running pods in nginx namespace
+
+
+yml file --> is also called as --> manifest file
+
+# kubectl delete ns nginx_namespace  - this will delete nginx_namespace 
+
+---------------------------------------------------------------------------------------------------------------------
+
+create a folder nginx
+
+create a manifest file to create a namespace
+
+#vim namespace.yml
+
+
