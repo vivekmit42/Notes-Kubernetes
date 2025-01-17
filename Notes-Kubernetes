@@ -178,3 +178,73 @@ You can also make your life easier by adding the following to your shell config:
 For additional insight into your cluster state, minikube bundles the Kubernetes Dashboard, allowing you to get easily acclimated to your new environment:
 
 # minikube dashboard
+
+--------------------------------------------------------------------------------------------------------------------------
+
+How to create a new pod?
+
+Step 1. create a pod.
+
+# kubectl create deployment my-ngnix --image=nginx:latest
+deployment.apps/my-ngnix created
+
+Step 2. Verify your deployments.
+# kubectl get deployments
+NAME       READY   UP-TO-DATE   AVAILABLE   AGE
+my-ngnix   0/1     1            0           21s
+
+Step 3. Verify your running pods
+# kubectl get pods
+NAME                        READY   STATUS              RESTARTS   AGE
+my-ngnix-5dc84b5fc7-rjf6b   0/1     ContainerCreating   0          39s
+
+
+-------------------------------------------------------------------------------------------------------------------------
+
+If you want to acces your pod thru a port
+
+then you have to use method service object
+
+in this we have to bind the port
+
+# kubectl expose deployment my-ngnix --port=80 --type=LoadBalancer
+service/my-ngnix exposed
+
+Then access your pod
+
+ # minikube service list
+|----------------------|---------------------------|--------------|---------------------------|
+|      NAMESPACE       |           NAME            | TARGET PORT  |            URL            |
+|----------------------|---------------------------|--------------|---------------------------|
+| default              | kubernetes                | No node port |                           |
+| default              | my-ngnix                  |           80 | http://192.168.49.2:31942 |
+| kube-system          | kube-dns                  | No node port |                           |
+| kubernetes-dashboard | dashboard-metrics-scraper | No node port |                           |
+| kubernetes-dashboard | kubernetes-dashboard      | No node port |                           |
+|----------------------|---------------------------|--------------|---------------------------|
+localhost:~ # minikube service my-ngnix
+|-----------|----------|-------------|---------------------------|
+| NAMESPACE |   NAME   | TARGET PORT |            URL            |
+|-----------|----------|-------------|---------------------------|
+| default   | my-ngnix |          80 | http://192.168.49.2:31942 |
+|-----------|----------|-------------|---------------------------|
+* Opening service default/my-ngnix in default browser...
+
+Open this address in web browser
+
+-----------------------------------------------------------------------------------------------------------------------
+Work Flow of K8s
+
+1. minikube start/delete                                        - start your cluster (minikube is single node cluster setup which uses single node for master and worker best for learning )
+
+2. minikube status                                                  - check your cluster status
+3. minikube dashboard                                               - Monitor your cluster status using Web UI
+4. kubectl create deployment_name_01 my-app --image=link            - then we picked pre-defined application ngnix from docker hub, using it we hvave created 1 deployment with deployment_name_01 as its name 
+5. kubectl get deployments                                          - check your deployment's state, if there is no issue then kubelet will automatically create pods for your deployment
+6. kubectl get pods                                                 - check your running pod's status 
+7. kubectl delete deployment my-app                                 - with this command you can delete deployment
+8. kubectl expose deployment my-app --type=LoadBalancer --port=80   - to access your application from outside, bind your port with this expose command in which we created one service with name as my-app 
+9. minikube service my-app                                          - to use that service use this command so that you can access your app
+10. kubectl get services                                            - to check your running services
+
+-------------------------------------------------------------------------------------------------------------------------
