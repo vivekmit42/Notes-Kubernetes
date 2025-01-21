@@ -452,12 +452,76 @@ create a manifest file to create a namespace
 
 #vim namespace.yml
 
-kind: Namespace
-apiVersion: v1
-metadata:
-  name: nginx
+kind: Namespace               -- Define type like its kind is namespace
+apiVersion: v1                --  it's api version is 1 becoz k8
+                                  version is 1
+metadata:                     -- It is an object
+  name: nginx                 -- It is name of namespace
 
 save & exit
 
+now we will run command to tell kubectl to apply this namespace.yml manifest file thru api server and apply on cluster. 
 
-Every you create a new configuration file then we have to instruct that 
+      #kubectl apply -f namespace.yml
+
+everything in k8 is manifest file
+so when you a create a manifest file like namespace.yml, then you apply that manifest after that k8 resource or object got created. whic you can see thru:
+
+    #kubectl get namespace
+
+------------------------------------------------------------------------
+
+create a manifest to create a pod
+NOTE: refer this page for example (https://kubernetes.io/docs/concepts/workloads/pods/)
+
+# vim pod.yml
+
+kind: Pod           -- its type is pod, kind is pod
+apiVersion: v1      -- its version 1
+metadata:           -- it is an object creation
+  name: nginx-pod   -- name of pod
+  namespace: nginx  -- to which name space it will part of
+spec:               -- to define pod specifications
+  containers:       -- to create a container in a pod
+  - name: nginx     -- defining name of container
+    image: nginx:latest   -- which image to use in container
+      ports:              -- define to use port feature
+      - containerPort: 80 -- define to use which port no used in this
+
+save n exit
+
+now tell kubectl to create a pod using this manifest file
+
+    #kubectl apply -f pod.yml
+
+now if you run this command then you will not get any pod:
+    #kubectl get pods
+
+because your pod is a part of a namespace whic you defined in manifest file.
+
+  #kubectl get pods -n nginx
+
+
+How to enter in pod
+
+  # kubectl exec -it pod/nginx-pod -n nginx -- bash
+
+How to see detailed info about your pod
+
+  # kubectl describe pod/nginx-pod -n nginx
+------------------------------------------------------------------------
+
+How to create a deployment manifest file
+
+kind: deployment          -- its type is deployment
+apiVersion: apps/v1       -- for every api-version there will be a 
+                              unique version value which we need to
+                              mention in our deployment manifest
+metadata:
+  name: nginx-deployment    -- name of this deployment
+  namespace: nginx          -- define to which part of the namespace it
+                                will be in
+
+spec:
+  replica: 2
+  
