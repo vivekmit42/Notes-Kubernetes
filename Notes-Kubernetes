@@ -452,4 +452,12 @@ create a manifest file to create a namespace
 
 #vim namespace.yml
 
+kind: Namespace
+apiVersion: v1
+metadata:
+  name: nginx
 
+save & exit
+
+
+Every you create a new configuration file then we have to instruct that 
